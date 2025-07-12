@@ -6,7 +6,7 @@
 /*   By: asaadeh <asaadeh@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/17 17:22:05 by asaadeh           #+#    #+#             */
-/*   Updated: 2025/07/10 20:51:32 by asaadeh          ###   ########.fr       */
+/*   Updated: 2025/07/12 20:19:30 by asaadeh          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,8 @@ int main(int argc ,char **argv)
     if(!init_fork(philo))
         return 1;
     init_philos(philo);
-    init_threads(philo);
+    if (init_threads(philo))
+        return 0;
     // printf("no_philo is:%d\n ",philo->data->philo_num);
     // printf("time to dye:%ld\n ",philo->data->death_time);
     // printf("time to eat:%ld\n ",philo->data->eat_time);

@@ -6,7 +6,7 @@
 /*   By: asaadeh <asaadeh@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/10 17:21:44 by asaadeh           #+#    #+#             */
-/*   Updated: 2025/07/10 20:58:49 by asaadeh          ###   ########.fr       */
+/*   Updated: 2025/07/12 20:29:15 by asaadeh          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,76 +18,91 @@ long get_time_in_ms()
     gettimeofday(&tv, NULL);
     return (tv.tv_sec * 1000) + (tv.tv_usec / 1000);
 }
+int monitor_death(t_philo *philo)
+{
+    long now;
+    int i;
 
-// void *routine(void *arg)
-// {
-//     t_philo *philo = (t_philo *)arg;
-//         long now = get_time_in_ms();
-    
-//         // printf("philo %d start thinking ...\n",philo->id);
-//         // pthread_mutex_lock(philo->left_fork);
-//         // printf("philo %d taking left fork ...\n",philo->id);
-//         // pthread_mutex_lock(philo->right_fork);
-//         // printf("philo %d taking right fork ...\n",philo->id);
-//         // philo->last_meal_time = get_time_in_ms();
-//         // printf("philo %d is eating ...\n",philo->id);
-//         // usleep(philo->data->eat_time * 1000);
-//         // pthread_mutex_unlock(philo->right_fork);
-//         // pthread_mutex_unlock(philo->left_fork);
-//         // printf("philo %ds is sleeping ...\n",philo->id);
-//         // usleep(philo->data->sleep_time * 1000);
-//          printf("%ld ms: philo %d is thinking\n", now - philo->data->start_time, philo->id);
+    while (!philo->data->flag)
+    {
+        i = 0;
+        while (i < philo->data->philo_num)
+        {
+            now = get_time_in_ms();
+            if ((now - philo[i].last_meal_time) >= philo->time_to_death)
+            {
+                philo->data->flag = 1;
+                printf_mutex(&philo[i], "%ld ms: philo %d is dying\n", now);
+                return 0;
+            }
+            i++;
+        }
+    }
+    return 1;
+}
 
-//         pthread_mutex_lock(philo->left_fork);
-//         printf("%ld ms: philo %d took left fork\n", get_time_in_ms() - philo->data->start_time, philo->id);
 
-//         pthread_mutex_lock(philo->right_fork);
-//         printf("%ld ms: philo %d took right fork\n", get_time_in_ms() - philo->data->start_time, philo->id);
-
-//         philo->last_meal_time = get_time_in_ms();
-//         printf("%ld ms: philo %d is eating\n", philo->last_meal_time - philo->data->start_time, philo->id);
-//         usleep(philo->data->eat_time * 1000);
-
-//         pthread_mutex_unlock(philo->right_fork);
-//         pthread_mutex_unlock(philo->left_fork);
-
-//         printf("%ld ms: philo %d is sleeping\n", get_time_in_ms() - philo->data->start_time, philo->id);
-//         usleep(philo->data->sleep_time * 1000);
-//     return NULL;
-// }
 
 void *routine(void *arg)
 {
     t_philo *philo = (t_philo *)arg;
 
-    while (1) 
+    while (!philo->data->flag)
     {
-        size_t timestamp = get_time_in_ms();
-        printf_mutex(philo,"%ld ms: philo %d is thinking\n",timestamp);   
+        if (philo->data->flag)
+            break;
         if (philo->id % 2 == 0) {
             pthread_mutex_lock(philo->right_fork);
-            printf_mutex(philo,"%ld ms: philo %d  has taken a fork\n", timestamp);
+            if (philo->data->flag) {
+                pthread_mutex_unlock(philo->right_fork);
+                break;
+            }
+            printf_mutex(philo, "%ld ms: philo %d has taken a fork\n", get_time_in_ms());
+
             pthread_mutex_lock(philo->left_fork);
-            printf_mutex(philo,"%ld ms: philo %d  has taken a fork\n", timestamp);
+            if (philo->data->flag) {
+                pthread_mutex_unlock(philo->left_fork);
+                pthread_mutex_unlock(philo->right_fork);
+                break;
+            }
+            printf_mutex(philo, "%ld ms: philo %d has taken a fork\n", get_time_in_ms());
         } 
         else 
         {
             pthread_mutex_lock(philo->left_fork);
-            printf_mutex(philo,"%ld ms: philo %d  has taken a fork\n", timestamp);
+            if (philo->data->flag) {
+                pthread_mutex_unlock(philo->left_fork);
+                break;
+            }
+            printf_mutex(philo, "%ld ms: philo %d has taken a fork\n", get_time_in_ms());
+
             pthread_mutex_lock(philo->right_fork);
-           printf_mutex(philo,"%ld ms: philo %d  has taken a fork\n", timestamp);
+            if (philo->data->flag) {
+                pthread_mutex_unlock(philo->right_fork);
+                pthread_mutex_unlock(philo->left_fork);
+                break;
+            }
+            printf_mutex(philo, "%ld ms: philo %d has taken a fork\n", get_time_in_ms());
         }
-        
-        philo->last_meal_time = timestamp;
-        printf_mutex(philo,"%ld ms: philo %d is eating\n", philo->last_meal_time);
+
+        philo->last_meal_time = get_time_in_ms();
+        printf_mutex(philo, "%ld ms: philo %d is eating\n", philo->last_meal_time);
+
         usleep(philo->data->eat_time * 1000);
 
         pthread_mutex_unlock(philo->left_fork);
         pthread_mutex_unlock(philo->right_fork);
 
-        printf_mutex(philo,"%ld ms: philo %d is sleeping\n", timestamp);
+        if (philo->data->flag)
+            break;
+        printf_mutex(philo, "%ld ms: philo %d is sleeping\n", get_time_in_ms());
         usleep(philo->data->sleep_time * 1000);
+
+        if (philo->data->flag)
+            break;
+        printf_mutex(philo, "%ld ms: philo %d is thinking\n", get_time_in_ms());
     }
+
     return NULL;
 }
 

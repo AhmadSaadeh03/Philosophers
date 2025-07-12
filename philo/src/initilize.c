@@ -6,7 +6,7 @@
 /*   By: asaadeh <asaadeh@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/17 19:44:46 by asaadeh           #+#    #+#             */
-/*   Updated: 2025/07/10 20:59:21 by asaadeh          ###   ########.fr       */
+/*   Updated: 2025/07/12 20:29:48 by asaadeh          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@ void init_arg(char **argv,t_philo *philo)
     philo->data->sleep_time = 0;
     philo->data->must_eat_time = 0;
     philo->data->start_time = 0;
+    philo->data->flag = 0;
     philo->data->philo_num = ft_atoi(argv[1]);
     philo->data->death_time = ft_atoi(argv[2]);
     philo->data->eat_time = ft_atoi(argv[3]);
@@ -76,30 +77,64 @@ int init_fork(t_philo *philo)
     }
     return 1;
 }
-void    printf_mutex(t_philo *philo,char *str1,size_t num)
+void     printf_mutex(t_philo *philo,char *str,long timestamp)
 {
     philo->print_mutex = malloc(sizeof(pthread_mutex_t));
     
     pthread_mutex_init(philo->print_mutex,NULL);
     pthread_mutex_lock(philo->print_mutex);
-    printf(str1, num - philo->data->start_time, philo->id);
+    printf(str, timestamp - philo->data->start_time, philo->id);
     pthread_mutex_unlock(philo->print_mutex);
 }
-
-void    init_threads(t_philo *philo)
+// int    init_threads(t_philo *philo)
+// {
+//     int i = 0;
+//     philo->data->start_time = get_time_in_ms();
+//     while (i < philo->data->philo_num)
+//     {
+//        if ((pthread_create(&philo[i].thread, NULL, &routine, &philo[i])) != 0)
+//             return 0;
+//         i++;
+//     }
+//     i = 0;
+//     monitor_death(philo);
+//     while (i < philo->data->philo_num)
+//     {
+//         pthread_join(philo[i].thread,NULL);
+//         i++;
+//     }
+//     return 1;
+    
+// }
+int init_threads(t_philo *philo)
 {
     int i = 0;
-    philo->data->start_time = get_time_in_ms();
+    long start = get_time_in_ms();
+    philo->data->start_time = start;
+
     while (i < philo->data->philo_num)
     {
-        pthread_create(&philo[i].thread, NULL, &routine, &philo[i]);
+        philo[i].last_meal_time = start;
         i++;
     }
+
     i = 0;
     while (i < philo->data->philo_num)
     {
-        pthread_join(philo[i].thread,NULL);
+        if (pthread_create(&philo[i].thread, NULL, &routine, &philo[i]) != 0)
+            return 0;
         i++;
     }
-    
+
+    monitor_death(philo);
+
+    i = 0;
+    while (i < philo->data->philo_num)
+    {
+        pthread_join(philo[i].thread, NULL);
+        i++;
+    }
+
+    return 1;
 }
+
