@@ -6,39 +6,78 @@
 /*   By: asaadeh <asaadeh@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/17 17:22:05 by asaadeh           #+#    #+#             */
-/*   Updated: 2025/07/12 20:19:30 by asaadeh          ###   ########.fr       */
+/*   Updated: 2025/07/13 18:24:34 by asaadeh          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
+// int main(int argc ,char **argv)
+// {
+//     t_data *data;
+//     if (argc < 5 || argc > 6)
+//         return 1;
+//     if (!valid_arg(argv))
+//         return 1;
+//     data = malloc(sizeof(t_data));
+//     if (!data)
+//         return 1;
+//     data->philos = malloc(sizeof(t_philo)* ft_atoi(argv[1]));
+//     if (!data->philos)
+//         return 1;
+//     init_arg(argv,data);
+//     if(!init_fork(data))
+//         return 1;
+//     init_philos(data);
+//     if (init_threads(data))
+//         return 0;
+//    pthread_mutex_destroy(&data->print_mutex);
+// free(data->print_mutex);
+// free(data->forks);
+// free(data->philos);
+// free(data);
+// }
+
 int main(int argc ,char **argv)
 {
-    t_philo *philo;
+    t_data *data;
+    int i;
+
     if (argc < 5 || argc > 6)
         return 1;
     if (!valid_arg(argv))
         return 1;
-    philo = malloc(sizeof(t_philo) * ft_atoi(argv[1]));
-    if (!philo)
+    data = malloc(sizeof(t_data));
+    if (!data)
         return 1;
-    philo->data = malloc(sizeof(t_data));
-    if (!philo->data)
+    data->philos = malloc(sizeof(t_philo) * ft_atoi(argv[1]));
+    if (!data->philos) {
+        free(data);
         return 1;
-    init_arg(argv,philo);
-    if(!init_fork(philo))
+    }
+    init_arg(argv, data);
+    if (!init_fork(data)) {
+        free(data->philos);
+        free(data);
         return 1;
-    init_philos(philo);
-    if (init_threads(philo))
-        return 0;
-    // printf("no_philo is:%d\n ",philo->data->philo_num);
-    // printf("time to dye:%ld\n ",philo->data->death_time);
-    // printf("time to eat:%ld\n ",philo->data->eat_time);
-    // printf("time to sleep:%ld\n ",philo->data->sleep_time);
-    // printf("must eat time:%ld\n ",philo->data->must_eat_time);
-    free(philo->forks);
-    free(philo->data);
-    free(philo);
-
-    
+    }
+    init_philos(data);
+    if (!init_threads(data)) {
+        i = 0;
+        while (i < data->philo_num)
+            pthread_mutex_destroy(&data->forks[i++]);
+        pthread_mutex_destroy(&data->print_mutex);
+        free(data->forks);
+        free(data->philos);
+        free(data);
+        return 1;
+    }
+    i = 0;
+    while (i < data->philo_num)
+        pthread_mutex_destroy(&data->forks[i++]);
+    pthread_mutex_destroy(&data->print_mutex);
+    free(data->forks);
+    free(data->philos);
+    free(data);
+    return 0;
 }
