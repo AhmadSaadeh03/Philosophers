@@ -6,7 +6,7 @@
 /*   By: asaadeh <asaadeh@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/17 17:22:05 by asaadeh           #+#    #+#             */
-/*   Updated: 2025/07/13 18:24:34 by asaadeh          ###   ########.fr       */
+/*   Updated: 2025/07/15 20:00:08 by asaadeh          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,6 +76,9 @@ int main(int argc ,char **argv)
     while (i < data->philo_num)
         pthread_mutex_destroy(&data->forks[i++]);
     pthread_mutex_destroy(&data->print_mutex);
+    pthread_mutex_destroy(&data->stop);
+    //pthread_mutex_destroy(&data->philos[i].last_meal);
+    //pthread_mutex_destroy(&data->philos[i].eat_mutex);
     free(data->forks);
     free(data->philos);
     free(data);

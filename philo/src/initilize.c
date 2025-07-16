@@ -6,7 +6,7 @@
 /*   By: asaadeh <asaadeh@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/17 19:44:46 by asaadeh           #+#    #+#             */
-/*   Updated: 2025/07/13 19:38:30 by asaadeh          ###   ########.fr       */
+/*   Updated: 2025/07/16 19:17:02 by asaadeh          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,7 @@ void init_arg(char **argv,t_data * data)
         data->must_eat = -1;  
     pthread_mutex_init(&data->print_mutex, NULL); 
     pthread_mutex_init(&data->stop, NULL); 
+    pthread_mutex_init(&data->all_ate_mutex, NULL);
 }
 void    init_philos(t_data *data)
 {
@@ -37,7 +38,7 @@ void    init_philos(t_data *data)
     t_philo *philos = data->philos;
     while (data->philo_num > i)
     {
-        philos[i].flag = &data->flag;
+        philos[i].stop = &data->flag;
         philos[i].id = i + 1;
         philos[i].time_to_death = data->death_time;
         philos[i].time_to_eat = data->eat_time;
@@ -49,8 +50,12 @@ void    init_philos(t_data *data)
         philos[i].left_fork = &data->forks[i];
         philos[i].right_fork = &data->forks[(i + 1) % data->philo_num];
         philos[i].print_mutex = &data->print_mutex;
+        philos[i].flag_mutex = &data->stop;
         pthread_mutex_init(&philos[i].last_meal, NULL);
         pthread_mutex_init(&philos[i].eat_mutex, NULL);
+        //pthread_mutex_init(&philos[i].flag_mutex, NULL);
+        pthread_mutex_init(&philos[i].count_mutex, NULL);
+        
         i++;
     }
     //  i = 0;
@@ -83,23 +88,35 @@ int init_fork(t_data *data)
     return 1;
 }
 
-int     printf_mutex(t_philo *data,char *str,long timestamp)
+void     printf_mutex(t_philo *philo,char *str,size_t timestamp)
 {
-    pthread_mutex_lock(data->print_mutex);
-    printf(str, timestamp - data->start_time, data->id);
-    pthread_mutex_unlock(data->print_mutex);
-    return 1 ;
+    pthread_mutex_lock(philo->flag_mutex);
+    if (!*philo->stop)
+    {
+        pthread_mutex_lock(philo->print_mutex);
+        printf(str, timestamp - philo->start_time, philo->id);
+        pthread_mutex_unlock(philo->print_mutex);
+        pthread_mutex_unlock(philo->flag_mutex);
+    }
+    //pthread_mutex_unlock(philo->flag_mutex);
+}
+void     printf_mutex_dead(t_philo *philo,char *str,size_t timestamp)
+{
+        pthread_mutex_lock(philo->print_mutex);
+        printf(str, timestamp - philo->start_time, philo->id);
+        pthread_mutex_unlock(philo->print_mutex);
 }
 
 int init_threads(t_data *data)
 {
     int i = 0;
-    data->start_time = get_time_in_ms();
+    size_t time = get_time_in_ms();
+    data->start_time = time;
 
     while (i < data->philo_num)
     {
         data->philos[i].last_meal_time =  data->start_time;
-         data->philos[i].start_time = data->start_time;
+        data->philos[i].start_time = data->start_time;
         i++;
     }
 
@@ -110,7 +127,8 @@ int init_threads(t_data *data)
             return 0;
         i++;
     }
-    monitor_death(data);
+    monitor_death (data);
+       
     i = 0;
     while (i < data->philo_num)
     {

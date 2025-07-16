@@ -6,7 +6,7 @@
 /*   By: asaadeh <asaadeh@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/17 17:30:24 by asaadeh           #+#    #+#             */
-/*   Updated: 2025/07/13 19:35:04 by asaadeh          ###   ########.fr       */
+/*   Updated: 2025/07/16 19:17:13 by asaadeh          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,27 +17,29 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/time.h>
-
+#include <stddef.h>
 struct	s_data; //this line is to define the structure before actually saying what's inside it
 
 typedef struct s_philo
 {
-	int		*flag;
+	int		*stop;
 	int     id;
-	long    time_to_eat;
-	long    time_to_sleep;
-	long    time_to_death;
-	long    time_to_start;
+	size_t    time_to_eat;
+	size_t    time_to_sleep;
+	size_t    time_to_death;
+	size_t    time_to_start;
 	long	must_eat;
-	long	last_meal_time;
+	size_t	last_meal_time;
 	long	eat_count;
-	long	start_time;
+	size_t	start_time;
 	pthread_t       thread;
 	pthread_mutex_t	*left_fork;
 	pthread_mutex_t	*print_mutex;
 	pthread_mutex_t	*right_fork;
 	pthread_mutex_t	last_meal;
 	pthread_mutex_t eat_mutex;
+	pthread_mutex_t *flag_mutex;
+	pthread_mutex_t	count_mutex;
 } t_philo;
 
 
@@ -45,16 +47,17 @@ typedef struct s_data
 {
 	int 	flag;
 	int     philo_num;
-	long    death_time;
-	long    eat_time;
-	long    sleep_time;
+	size_t    death_time;
+	size_t    eat_time;
+	size_t    sleep_time;
 	long	must_eat;
-	long	start_time;
-	long	current_time;
+	size_t	start_time;
+	size_t	current_time;
 	t_philo *philos;
 	pthread_mutex_t	*forks;
 	pthread_mutex_t	stop;
 	pthread_mutex_t	print_mutex;
+	pthread_mutex_t all_ate_mutex;
 
 } t_data;
 
@@ -67,8 +70,9 @@ void    init_philos(t_data *data);
 int init_fork(t_data *data);
 void *routine(void *arg);
 int init_threads(t_data *data);
-long get_time_in_ms();
-int     printf_mutex(t_philo *data,char *str,long timestamp);
+size_t get_time_in_ms();
+void     printf_mutex(t_philo *philo,char *str,size_t timestamp);
+void     printf_mutex_dead(t_philo *philo,char *str,size_t timestamp);
 int monitor_death(t_data *data);
 #endif
 
