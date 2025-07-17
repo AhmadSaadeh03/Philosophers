@@ -6,7 +6,7 @@
 /*   By: asaadeh <asaadeh@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/17 18:06:20 by asaadeh           #+#    #+#             */
-/*   Updated: 2025/07/09 14:02:48 by asaadeh          ###   ########.fr       */
+/*   Updated: 2025/07/17 20:42:04 by asaadeh          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@ int	ft_isdigit(int s)
 	}
 	return (0);
 }
+
 int	ft_atoi(const char *nptr)
 {
 	char	*str;
@@ -46,22 +47,26 @@ int	ft_atoi(const char *nptr)
 	}
 	return (res * sign);
 }
-int valid_arg(char **argv)
+
+int	valid_arg(char **argv)
 {
-	int i = 1;
-    int j = 0;
-    while (argv[i])
-    {
-        j = 0;
-        while (argv[i][j])
-        {
-            if (argv[i][j] == '+')
-                j++;
-            if (!ft_isdigit(argv[i][j]))
-                return 0;
-            j++;
-        }
-        i++;
-    }
-	return 1;
+	int	i;
+	int	j;
+
+	i = 1;
+	j = 0;
+	while (argv[i])
+	{
+		j = 0;
+		while (argv[i][j])
+		{
+			if (argv[i][j] == '+')
+				j++;
+			if (!ft_isdigit(argv[i][j]))
+				return (0);
+			j++;
+		}
+		i++;
+	}
+	return (1);
 }
