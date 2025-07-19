@@ -6,7 +6,7 @@
 /*   By: asaadeh <asaadeh@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/17 17:30:24 by asaadeh           #+#    #+#             */
-/*   Updated: 2025/07/17 20:47:31 by asaadeh          ###   ########.fr       */
+/*   Updated: 2025/07/19 20:47:09 by asaadeh          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,10 +34,9 @@ typedef struct s_philo
 	int				philo_num;
 	pthread_t		thread;
 	pthread_mutex_t	*left_fork;
-	pthread_mutex_t	*print_mutex;
 	pthread_mutex_t	*right_fork;
+	pthread_mutex_t	*print_mutex;
 	pthread_mutex_t	last_meal;
-	pthread_mutex_t	eat_mutex;
 	pthread_mutex_t	*flag_mutex;
 	pthread_mutex_t	count_mutex;
 }					t_philo;
@@ -56,7 +55,6 @@ typedef struct s_data
 	pthread_mutex_t	*forks;
 	pthread_mutex_t	stop;
 	pthread_mutex_t	print_mutex;
-	pthread_mutex_t	must_eat_mutex;
 
 }					t_data;
 
@@ -76,5 +74,6 @@ int					monitor_death(t_data *data);
 void				*handle_one_philo(t_philo *philos);
 void				smart_usleep(size_t time);
 int					should_stop(t_philo *philos, int mode);
+int					should_stop_cont(t_philo *philos, int mode);
 
 #endif

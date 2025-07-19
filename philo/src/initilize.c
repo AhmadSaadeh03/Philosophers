@@ -6,7 +6,7 @@
 /*   By: asaadeh <asaadeh@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/17 19:44:46 by asaadeh           #+#    #+#             */
-/*   Updated: 2025/07/17 20:45:15 by asaadeh          ###   ########.fr       */
+/*   Updated: 2025/07/19 20:50:26 by asaadeh          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,6 @@ void	init_arg(char **argv, t_data *data)
 		data->must_eat = -1;
 	pthread_mutex_init(&data->print_mutex, NULL);
 	pthread_mutex_init(&data->stop, NULL);
-	pthread_mutex_init(&data->must_eat_mutex, NULL);
 }
 
 void	init_philos(t_data *data)
@@ -48,7 +47,7 @@ void	init_philos(t_data *data)
 		philos[i].time_to_death = data->death_time;
 		philos[i].time_to_eat = data->eat_time;
 		philos[i].time_to_sleep = data->sleep_time;
-		philos[i].philo_num = data->philo_num; // here
+		philos[i].philo_num = data->philo_num;
 		if (data->must_eat != -1)
 			philos[i].must_eat = data->must_eat;
 		philos[i].eat_count = 0;
@@ -58,8 +57,6 @@ void	init_philos(t_data *data)
 		philos[i].print_mutex = &data->print_mutex;
 		philos[i].flag_mutex = &data->stop;
 		pthread_mutex_init(&philos[i].last_meal, NULL);
-		pthread_mutex_init(&philos[i].eat_mutex, NULL);
-		// pthread_mutex_init(&philos[i].flag_mutex, NULL);
 		pthread_mutex_init(&philos[i].count_mutex, NULL);
 		i++;
 	}
@@ -78,6 +75,20 @@ int	init_fork(t_data *data)
 	while (i < data->philo_num)
 	{
 		pthread_mutex_init(&data->forks[i], NULL);
+		i++;
+	}
+	return (1);
+}
+
+int	ft_join(t_data *data)
+{
+	int	i;
+
+	i = 0;
+	while (i < data->philo_num)
+	{
+		if (pthread_join(data->philos[i].thread, NULL) != 0)
+			return (0);
 		i++;
 	}
 	return (1);
@@ -106,12 +117,7 @@ int	init_threads(t_data *data)
 		i++;
 	}
 	monitor_death(data);
-	i = 0;
-	while (i < data->philo_num)
-	{
-		if (pthread_join(data->philos[i].thread, NULL) != 0)
-			return (0);
-		i++;
-	}
+	if (!ft_join(data))
+		return (0);
 	return (1);
 }

@@ -6,7 +6,7 @@
 /*   By: asaadeh <asaadeh@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/17 19:57:22 by asaadeh           #+#    #+#             */
-/*   Updated: 2025/07/17 20:46:46 by asaadeh          ###   ########.fr       */
+/*   Updated: 2025/07/19 20:46:33 by asaadeh          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,8 +34,7 @@ void	smart_usleep(size_t time)
 void	*handle_one_philo(t_philo *philos)
 {
 	pthread_mutex_lock(philos->left_fork);
-	printf_mutex(philos, "%ld ms: philo %d has taken a fork\n",
-		get_time_in_ms());
+	printf_mutex(philos, "%ld %d has taken a fork\n", get_time_in_ms());
 	while (!should_stop(philos, 3))
 		usleep(100);
 	pthread_mutex_unlock(philos->left_fork);
@@ -53,7 +52,9 @@ void	printf_mutex(t_philo *philo, char *str, size_t timestamp)
 		pthread_mutex_unlock(philo->flag_mutex);
 	}
 	else
+	{
 		pthread_mutex_unlock(philo->flag_mutex);
+	}
 }
 
 void	printf_mutex_dead(t_philo *philo, char *str, size_t timestamp)

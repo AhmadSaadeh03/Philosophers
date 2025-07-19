@@ -6,7 +6,7 @@
 /*   By: asaadeh <asaadeh@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/17 20:03:13 by asaadeh           #+#    #+#             */
-/*   Updated: 2025/07/17 20:43:00 by asaadeh          ###   ########.fr       */
+/*   Updated: 2025/07/19 20:46:46 by asaadeh          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ static int	check_death(t_data *data)
 			pthread_mutex_lock(&data->stop);
 			data->flag = 1;
 			pthread_mutex_unlock(&data->stop);
-			printf_mutex_dead(&data->philos[i], "%ld ms: philo %d died\n", now);
+			printf_mutex_dead(&data->philos[i], "%ld %d died\n", now);
 			return (1);
 		}
 		pthread_mutex_unlock(&data->philos[i].last_meal);
@@ -48,11 +48,9 @@ static int	check_all_ate(t_data *data)
 		return (0);
 	while (i < data->philo_num)
 	{
-		pthread_mutex_lock(&data->philos[i].eat_mutex);
 		pthread_mutex_lock(&data->philos[i].count_mutex);
 		if (data->philos[i].eat_count < data->must_eat)
 			all_ate = 0;
-		pthread_mutex_unlock(&data->philos[i].eat_mutex);
 		pthread_mutex_unlock(&data->philos[i].count_mutex);
 		i++;
 	}
@@ -74,7 +72,7 @@ int	monitor_death(t_data *data)
 		pthread_mutex_lock(&data->stop);
 		data->flag = 1;
 		pthread_mutex_unlock(&data->stop);
-		printf_mutex_dead(&data->philos[0], "%ld ms: philo %d died\n",
+		printf_mutex_dead(&data->philos[0], "%ld %d died\n",
 			get_time_in_ms());
 		return (0);
 	}
