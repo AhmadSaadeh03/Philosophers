@@ -6,7 +6,7 @@
 /*   By: asaadeh <asaadeh@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/17 17:30:24 by asaadeh           #+#    #+#             */
-/*   Updated: 2025/07/19 20:47:09 by asaadeh          ###   ########.fr       */
+/*   Updated: 2025/07/20 16:36:03 by asaadeh          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,8 +61,8 @@ typedef struct s_data
 int					ft_atoi(const char *nptr);
 int					ft_isdigit(int s);
 int					valid_arg(char **argv);
-void				init_arg(char **argv, t_data *data);
-void				init_philos(t_data *data);
+int					init_arg(char **argv, t_data *data);
+int					init_philos(t_data *data);
 int					init_fork(t_data *data);
 void				*routine(void *arg);
 int					init_threads(t_data *data);

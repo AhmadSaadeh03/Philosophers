@@ -1,6 +1,6 @@
 CC = cc
 CFLAGS = -Wall -Wextra -Werror -pthread -g3
-SRCS = src/main.c src/error_handling.c src/initilize.c src/routine.c src/helper.c src/monitor_death.c src/utils.c
+SRCS = src/main.c src/error_handling.c src/initilize.c src/routine.c src/helper.c src/monitor_death.c src/utils.c src/init_threads.c
 NAME = philo
 OBJ = $(SRCS:.c=.o)
 

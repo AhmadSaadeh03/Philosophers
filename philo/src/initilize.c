@@ -6,13 +6,13 @@
 /*   By: asaadeh <asaadeh@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/17 19:44:46 by asaadeh           #+#    #+#             */
-/*   Updated: 2025/07/19 20:50:26 by asaadeh          ###   ########.fr       */
+/*   Updated: 2025/07/20 17:22:02 by asaadeh          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-void	init_arg(char **argv, t_data *data)
+int	init_arg(char **argv, t_data *data)
 {
 	data->philo_num = 0;
 	data->death_time = 0;
@@ -29,37 +29,57 @@ void	init_arg(char **argv, t_data *data)
 		data->must_eat = ft_atoi(argv[5]);
 	else
 		data->must_eat = -1;
-	pthread_mutex_init(&data->print_mutex, NULL);
-	pthread_mutex_init(&data->stop, NULL);
+	if (pthread_mutex_init(&data->print_mutex, NULL) != 0)
+		return (0);
+	if (pthread_mutex_init(&data->stop, NULL) != 0)
+		return (0);
+	return (1);
 }
 
-void	init_philos(t_data *data)
+static int	init_philo_mutexes(t_philo *philo)
+{
+	if (pthread_mutex_init(&philo->last_meal, NULL) != 0)
+		return (0);
+	if (pthread_mutex_init(&philo->count_mutex, NULL) != 0)
+		return (0);
+	return (1);
+}
+
+static int	init_philo_fields(t_data *data, t_philo *philo, int i)
+{
+	philo->stop = &data->flag;
+	philo->id = i + 1;
+	philo->time_to_death = data->death_time;
+	philo->time_to_eat = data->eat_time;
+	philo->time_to_sleep = data->sleep_time;
+	philo->philo_num = data->philo_num;
+	if (data->must_eat != -1)
+		philo->must_eat = data->must_eat;
+	philo->eat_count = 0;
+	philo->start_time = data->start_time;
+	philo->left_fork = &data->forks[i];
+	philo->right_fork = &data->forks[(i + 1) % data->philo_num];
+	philo->print_mutex = &data->print_mutex;
+	philo->flag_mutex = &data->stop;
+	return (1);
+}
+
+int	init_philos(t_data *data)
 {
 	int		i;
 	t_philo	*philos;
 
-	i = 0;
 	philos = data->philos;
-	while (data->philo_num > i)
+	i = 0;
+	while (i < data->philo_num)
 	{
-		philos[i].stop = &data->flag;
-		philos[i].id = i + 1;
-		philos[i].time_to_death = data->death_time;
-		philos[i].time_to_eat = data->eat_time;
-		philos[i].time_to_sleep = data->sleep_time;
-		philos[i].philo_num = data->philo_num;
-		if (data->must_eat != -1)
-			philos[i].must_eat = data->must_eat;
-		philos[i].eat_count = 0;
-		philos[i].start_time = data->start_time;
-		philos[i].left_fork = &data->forks[i];
-		philos[i].right_fork = &data->forks[(i + 1) % data->philo_num];
-		philos[i].print_mutex = &data->print_mutex;
-		philos[i].flag_mutex = &data->stop;
-		pthread_mutex_init(&philos[i].last_meal, NULL);
-		pthread_mutex_init(&philos[i].count_mutex, NULL);
+		if (!init_philo_fields(data, &philos[i], i))
+			return (0);
+		if (!init_philo_mutexes(&philos[i]))
+			return (0);
 		i++;
 	}
+	return (1);
 }
 
 int	init_fork(t_data *data)
@@ -77,47 +97,5 @@ int	init_fork(t_data *data)
 		pthread_mutex_init(&data->forks[i], NULL);
 		i++;
 	}
-	return (1);
-}
-
-int	ft_join(t_data *data)
-{
-	int	i;
-
-	i = 0;
-	while (i < data->philo_num)
-	{
-		if (pthread_join(data->philos[i].thread, NULL) != 0)
-			return (0);
-		i++;
-	}
-	return (1);
-}
-
-int	init_threads(t_data *data)
-{
-	int		i;
-	size_t	time;
-
-	i = 0;
-	time = get_time_in_ms();
-	data->start_time = time;
-	while (i < data->philo_num)
-	{
-		data->philos[i].last_meal_time = data->start_time;
-		data->philos[i].start_time = data->start_time;
-		i++;
-	}
-	i = 0;
-	while (i < data->philo_num)
-	{
-		if (pthread_create(&data->philos[i].thread, NULL, &routine,
-				&data->philos[i]) != 0)
-			return (0);
-		i++;
-	}
-	monitor_death(data);
-	if (!ft_join(data))
-		return (0);
 	return (1);
 }
