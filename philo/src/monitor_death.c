@@ -6,7 +6,7 @@
 /*   By: asaadeh <asaadeh@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/17 20:03:13 by asaadeh           #+#    #+#             */
-/*   Updated: 2025/07/19 20:46:46 by asaadeh          ###   ########.fr       */
+/*   Updated: 2025/07/20 17:33:05 by asaadeh          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,12 +68,11 @@ int	monitor_death(t_data *data)
 {
 	if (data->philo_num == 1)
 	{
-		smart_usleep(data->death_time);
+		smart_usleep(data->death_time, data->philos);
 		pthread_mutex_lock(&data->stop);
 		data->flag = 1;
 		pthread_mutex_unlock(&data->stop);
-		printf_mutex_dead(&data->philos[0], "%ld %d died\n",
-			get_time_in_ms());
+		printf_mutex_dead(&data->philos[0], "%ld %d died\n", get_time_in_ms());
 		return (0);
 	}
 	while (1)

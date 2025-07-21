@@ -6,7 +6,7 @@
 /*   By: asaadeh <asaadeh@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/17 17:22:05 by asaadeh           #+#    #+#             */
-/*   Updated: 2025/07/20 17:21:46 by asaadeh          ###   ########.fr       */
+/*   Updated: 2025/07/20 18:15:50 by asaadeh          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,21 +42,29 @@ static int	check_arg(t_data *data)
 	return (1);
 }
 
-int	free_dataphilo(t_data *data)
+void	free_dataphilo(t_data *data)
 {
 	free(data->philos);
 	free(data);
-	return (0);
 }
 
 static int	is_succsess(char **argv, t_data *data)
 {
 	if (!init_arg(argv, data))
+	{
 		free_dataphilo(data);
-	if (!check_arg(data))
+		return (0);
+	}
+	if (check_arg(data) == 0)
+	{
 		free_dataphilo(data);
+		return (0);
+	}
 	if (!init_fork(data))
+	{
 		free_dataphilo(data);
+		return (0);
+	}
 	if (!init_philos(data))
 	{
 		free(data->forks);

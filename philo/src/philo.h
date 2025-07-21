@@ -6,7 +6,7 @@
 /*   By: asaadeh <asaadeh@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/17 17:30:24 by asaadeh           #+#    #+#             */
-/*   Updated: 2025/07/20 16:36:03 by asaadeh          ###   ########.fr       */
+/*   Updated: 2025/07/20 17:32:29 by asaadeh          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,7 +72,7 @@ void				printf_mutex_dead(t_philo *philo, char *str,
 						size_t timestamp);
 int					monitor_death(t_data *data);
 void				*handle_one_philo(t_philo *philos);
-void				smart_usleep(size_t time);
+void				smart_usleep(size_t time, t_philo *philo);
 int					should_stop(t_philo *philos, int mode);
 int					should_stop_cont(t_philo *philos, int mode);
 

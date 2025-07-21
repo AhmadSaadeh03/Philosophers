@@ -6,7 +6,7 @@
 /*   By: asaadeh <asaadeh@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/17 19:57:22 by asaadeh           #+#    #+#             */
-/*   Updated: 2025/07/19 20:46:33 by asaadeh          ###   ########.fr       */
+/*   Updated: 2025/07/20 17:51:07 by asaadeh          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,13 +20,15 @@ size_t	get_time_in_ms(void)
 	return ((tv.tv_sec * 1000) + (tv.tv_usec / 1000));
 }
 
-void	smart_usleep(size_t time)
+void	smart_usleep(size_t time, t_philo *philo)
 {
 	size_t	start;
 
 	start = get_time_in_ms();
 	while (get_time_in_ms() - start < time)
 	{
+		if (should_stop(philo, 3))
+			break ;
 		usleep(50);
 	}
 }

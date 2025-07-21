@@ -6,7 +6,7 @@
 /*   By: asaadeh <asaadeh@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/10 17:21:44 by asaadeh           #+#    #+#             */
-/*   Updated: 2025/07/19 20:50:03 by asaadeh          ###   ########.fr       */
+/*   Updated: 2025/07/20 17:53:20 by asaadeh          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,7 @@ static int	is_eating(t_philo *philos)
 	pthread_mutex_lock(&philos->count_mutex);
 	philos->eat_count++;
 	pthread_mutex_unlock(&philos->count_mutex);
-	smart_usleep(philos->time_to_eat);
+	smart_usleep(philos->time_to_eat, philos);
 	return (1);
 }
 
@@ -66,7 +66,7 @@ static void	is_sleeping(t_philo *philo)
 	if (should_stop(philo, 3))
 		return ;
 	printf_mutex(philo, "%ld %d is sleeping\n", get_time_in_ms());
-	smart_usleep(philo->time_to_sleep);
+	smart_usleep(philo->time_to_sleep, philo);
 }
 
 void	*routine(void *arg)
